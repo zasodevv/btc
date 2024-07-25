@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Wallet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1e1e2d;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            margin: 0;
+            cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+        }
+
+        .header .user-info {
+            text-align: right;
+        }
+
+        .header .user-info p {
+            margin: 0;
+        }
+
+        .header .log-out {
+            background-color: #ff4d4d;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .header .log-out:hover {
+            background-color: #ff2d2d;
+        }
+
+        .balance-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2d2d3a;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .balance-section .balance {
+            text-align: center;
+            flex: 1 1 100%;
+        }
+
+        .balance-section .balance h2 {
+            font-size: 40px;
+            margin: 0;
+        }
+
+        .balance-section .balance p {
+            font-size: 18px;
+            color: #a0a0b1;
+        }
+
+        .balance-section .balance-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 10px solid #ffab00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .balance-section .balance-circle .balance-amount {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .balance-section .send-receive-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 100%;
+            text-align: center;
+        }
+
+        .balance-section .send-receive-buttons button {
+            background-color: #ffab00;
+            color: #1e1e2d;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 80%;
+            margin: 10px auto;
+        }
+
+        .balance-section .send-receive-buttons button:hover {
+            background-color: #ffc107;
+        }
+
+        .transactions-section {
+            background-color: #2d2d3a;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .transactions-section h2 {
+            margin: 0 0 20px 0;
+        }
+
+        .transactions-section table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-section table th, .transactions-section table td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .transactions-section table th {
+            background-color: #383848;
+        }
+
+        .transactions-section table tr:nth-child(even) {
+            background-color: #3c3c4a;
+        }
+
+        .transactions-section table tr:hover {
+            background-color: #484858;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #383848;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background-color: #2d2d3a;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 20px 0;
+        }
+
+        .modal-content input[type="text"], .modal-content input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #1e1e2d;
+            color: #ffffff;
+        }
+
+        .modal-content button {
+            background-color: #ffab00;
+            color: #1e1e2d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .modal-content button:hover {
+            background-color: #ffc107;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        @media (min-width: 768px) {
+            .header, .balance-section {
+                flex-wrap: nowrap;
+            }
+            
+            .balance-section .balance, 
+            .balance-section .send-receive-buttons {
+                flex: 1;
+            }
+
+            .balance-section .send-receive-buttons {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+
+            .balance-section .send-receive-buttons button {
+                width: auto;
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="resetButton">Bitcoin Wallet</h1>
+            <div class="user-info">
+                <p>Logged in as: <strong>zaso</strong></p>
+                <p>Balance: <span id="balance">$34,000</span></p>
+                <button class="log-out" id="logOutButton">Log Out</button>
+            </div>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance">
+                <h2 id="btcBalance">1.2345 BTC</h2>
+                <p id="balanceInUsd">$34,000</p>
+            </div>
+            <div class="balance-circle">
+                <div class="balance-amount" id="circleAmount">1.2345 BTC</div>
+            </div>
+            <div class="send-receive-buttons">
+                <button id="sendButton">Send</button>
+                <button id="receiveButton">Receive</button>
+            </div>
+        </div>
+
+        <div class="transactions-section">
+            <h2>Recent Transactions</h2>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Transactions will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Bitcoin Wallet. All rights reserved.</p>
+        </div>
+    </div>
+
+    <!-- Send Modal -->
+    <div id="sendModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="sendModalClose">&times;</span>
+            <h2>Send Bitcoin</h2>
+            <input type="text" id="btcAddress" placeholder="Enter BTC Address">
+            <input type="number" id="btcAmount" placeholder="Enter Amount (BTC)" step="0.0001">
+            <button id="sendConfirm">Send</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="successModalClose">&times;</span>
+            <h2>Success</h2>
+            <p>Bitcoin has been sent!</p>
+        </div>
+    </div>
+
+    <!-- Log Out Modal -->
+    <div id="logOutModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="logOutModalClose">&times;</span>
+            <h2>Log Out</h2>
+            <p>Are you sure you want to log out?</p>
+            <button id="confirmLogOut">Yes, Log Out</button>
+            <button id="cancelLogOut">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        const balanceElement = document.getElementById("balance");
+        const balanceInUsdElement = document.getElementById("balanceInUsd");
+        const btcBalanceElement = document.getElementById("btcBalance");
+        const circleAmountElement = document.getElementById("circleAmount");
+        const transactionsTable = document.getElementById("transactionsTable").getElementsByTagName("tbody")[0];
+        const resetButton = document.getElementById("resetButton");
+
+        let balance = 34000; // $34,000
+        let btcBalance = 1.2345; // 1.2345 BTC
+        let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+        // Load data from localStorage
+        function loadData() {
+            const savedBalance = localStorage.getItem("balance");
+            const savedBtcBalance = localStorage.getItem("btcBalance");
+
+            if (savedBalance) balance = parseFloat(savedBalance);
+            if (savedBtcBalance) btcBalance = parseFloat(savedBtcBalance);
+
+            // Update UI
+            balanceElement.textContent = `$${balance.toFixed(2)}`;
+            balanceInUsdElement.textContent = `$${balance.toFixed(2)}`;
+            btcBalanceElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+            circleAmountElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+
+            // Populate transactions
+            transactions.forEach(transaction => {
+                const row = transactionsTable.insertRow();
+                row.insertCell(0).textContent = transaction.date;
+                row.insertCell(1).textContent = transaction.type;
+                row.insertCell(2).textContent = `${transaction.amount} BTC`;
+                row.insertCell(3).textContent = transaction.status;
+            });
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem("balance", balance);
+            localStorage.setItem("btcBalance", btcBalance);
+            localStorage.setItem("transactions", JSON.stringify(transactions));
+        }
+
+        // Handle Send Bitcoin
+        document.getElementById("sendButton").onclick = function() {
+            document.getElementById("sendModal").style.display = "block";
+        }
+
+        document.getElementById("sendModalClose").onclick = function() {
+            document.getElementById("sendModal").style.display = "none";
+        }
+
+        document.getElementById("successModalClose").onclick = function() {
+            document.getElementById("successModal").style.display = "none";
+        }
+
+        document.getElementById("sendConfirm").onclick = function() {
+            const btcAddress = document.getElementById("btcAddress").value;
+            const btcAmount = parseFloat(document.getElementById("btcAmount").value);
+
+            if (btcAddress && btcAmount > 0 && btcAmount <= btcBalance) {
+                // Deduct amount from balance
+                btcBalance -= btcAmount;
+                balance -= btcAmount * 30000; // Example conversion rate: $30,000 per BTC
+
+                // Add transaction to history
+                const now = new Date();
+                const transaction = {
+                    date: now.toISOString().split('T')[0],
+                    type: "Sent",
+                    amount: btcAmount.toFixed(4),
+                    status: "Completed"
+                };
+                transactions.push(transaction);
+
+                // Update UI
+                btcBalanceElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+                circleAmountElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+                balanceElement.textContent = `$${balance.toFixed(2)}`;
+                balanceInUsdElement.textContent = `$${balance.toFixed(2)}`;
+                transactionsTable.insertRow().innerHTML = `
+                    <td>${transaction.date}</td>
+                    <td>${transaction.type}</td>
+                    <td>${transaction.amount} BTC</td>
+                    <td>${transaction.status}</td>
+                `;
+
+                // Save data
+                saveData();
+
+                // Show success modal
+                document.getElementById("sendModal").style.display = "none";
+                document.getElementById("successModal").style.display = "block";
+            } else {
+                alert("Invalid amount or address.");
+            }
+        }
+
+        // Handle Receive Bitcoin
+        document.getElementById("receiveButton").onclick = function() {
+            // Generate a random amount over $500
+            const minAmount = 500;
+            const maxAmount = 1000; // Set an upper limit if needed
+            const receiveAmount = Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
+
+            // Update balance
+            balance += receiveAmount;
+            btcBalance += receiveAmount / 30000; // Example conversion rate: $30,000 per BTC
+
+            // Add transaction to history
+            const now = new Date();
+            const transaction = {
+                date: now.toISOString().split('T')[0],
+                type: "Received",
+                amount: (receiveAmount / 30000).toFixed(4),
+                status: "Completed"
+            };
+            transactions.push(transaction);
+
+            // Update UI
+            btcBalanceElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+            circleAmountElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+            balanceElement.textContent = `$${balance.toFixed(2)}`;
+            balanceInUsdElement.textContent = `$${balance.toFixed(2)}`;
+            transactionsTable.insertRow().innerHTML = `
+                <td>${transaction.date}</td>
+                <td>${transaction.type}</td>
+                <td>${transaction.amount} BTC</td>
+                <td>${transaction.status}</td>
+            `;
+
+            // Save data
+            saveData();
+        }
+
+        document.getElementById("logOutButton").onclick = function() {
+            document.getElementById("logOutModal").style.display = "block";
+        }
+
+        document.getElementById("logOutModalClose").onclick = function() {
+            document.getElementById("logOutModal").style.display = "none";
+        }
+
+        document.getElementById("confirmLogOut").onclick = function() {
+            // Redirect to index.html
+            window.location.href = "index.html";
+        }
+
+        document.getElementById("cancelLogOut").onclick = function() {
+            document.getElementById("logOutModal").style.display = "none";
+        }
+
+        // Handle reset
+        resetButton.onclick = function() {
+            balance = 34000; // Reset to initial balance
+            btcBalance = 1.2345; // Reset to initial BTC balance
+            transactions = []; // Clear transactions
+
+            // Update UI
+            balanceElement.textContent = `$${balance.toFixed(2)}`;
+            balanceInUsdElement.textContent = `$${balance.toFixed(2)}`;
+            btcBalanceElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+            circleAmountElement.textContent = `${btcBalance.toFixed(4)} BTC`;
+
+            // Clear transactions table
+            transactionsTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
+
+            // Clear local storage
+            localStorage.removeItem("balance");
+            localStorage.removeItem("btcBalance");
+            localStorage.removeItem("transactions");
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("sendModal") ||
+                event.target == document.getElementById("successModal") ||
+                event.target == document.getElementById("logOutModal")) {
+                document.getElementById("sendModal").style.display = "none";
+                document.getElementById("successModal").style.display = "none";
+                document.getElementById("logOutModal").style.display = "none";
+            }
+        }
+
+        // Initial load
+        loadData();
+    </script>
+</body>
+</html>
